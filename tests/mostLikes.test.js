@@ -2,7 +2,7 @@ const { test, describe } = require('node:test')
 const assert = require('node:assert')
 const listHelper = require('../utils/list_helper')
 
-const mostBlogs = listHelper.mostBlogs
+const mostLikes = listHelper.mostLikes
 
 describe('total likes', () => {
     const listWithOneBlog = [
@@ -68,17 +68,17 @@ describe('total likes', () => {
       ]
   
     test('when list has only one blog, returns one author', () => {
-      const result = mostBlogs(listWithOneBlog)
-      assert.deepEqual(result, {'author': 'Edsger W. Dijkstra', 'blogs': 1})
+      const result = mostLikes(listWithOneBlog)
+      assert.deepEqual(result, {'author': 'Edsger W. Dijkstra', 'likes': 5})
     }),
     
     test('when list has multiple blogs, return the author with the most blogs', () => {
-      const result = mostBlogs(blogs)
-      assert.deepEqual(result, {'author': 'Robert C. Martin', 'blogs': 3})
+      const result = mostLikes(blogs)
+      assert.deepEqual(result, {'author': 'Edsger W. Dijkstra', 'likes': 17})
     }),
     
     test('when list has 0 blogs, returns 0 likes', () => {
-      const result = mostBlogs([])
+      const result = mostLikes([])
       assert.strictEqual(result, undefined)
     })
   })
