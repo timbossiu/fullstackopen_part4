@@ -87,6 +87,49 @@ test('a blog without author and url will be added ', async () => {
   assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
 })
 
+test('delete succesfully a blog ', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+
+  firstId = blogsAtStart[0].id
+
+
+  console.log(firstId)
+  await api
+    .delete(`/api/blogs/${firstId}`)
+    .expect(204)
+  
+  const blogsAtEnd = await helper.blogsInDb()
+
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
+})
+
+test('update succesfully a blog ', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+
+  firstId = blogsAtStart[0].id
+
+  const updatedBlog = {
+    author: 'Test',
+    title: 'AsyncNew',
+    url: 'http:test.com',
+  }
+
+
+  console.log(firstId)
+  await api
+    .put(`/api/blogs/${firstId}`)
+    .send(updatedBlog)
+    .expect(200)
+  
+  const blogsAtEnd = await helper.blogsInDb()
+
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+  assert.strictEqual(blogsAtEnd[0].author, updatedBlog.author)
+  assert.strictEqual(blogsAtEnd[0].title, updatedBlog.title)
+  assert.strictEqual(blogsAtEnd[0].url, updatedBlog.url)
+  assert.strictEqual(blogsAtEnd[0].likes, blogsAtStart[0].likes)
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
