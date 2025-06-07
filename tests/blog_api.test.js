@@ -54,6 +54,39 @@ test('blog is saved with renamed id not _id', async () => {
   assert.ok(!('_id' in blogsAtEnd[0]), '"_id" field does not exist')
 })
 
+test('a blog without likes will be added ', async () => {
+  const newBlog = {
+    author: 'Test',
+    title: 'AsyncNew',
+    url: 'http:test.com',
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const addedBlog = await Blog.findOne({author: 'Test'})
+  assert.strictEqual(addedBlog.likes, 0)
+})
+
+test('a blog without author and url will be added ', async () => {
+  const newBlog = {
+    title: 'AsyncNew',
+    likes: 2
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+
+  const blogsAtEnd = await helper.blogsInDb()
+
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
