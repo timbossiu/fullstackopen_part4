@@ -4,7 +4,7 @@ const listHelper = require('../utils/list_helper')
 
 const mostLikes = listHelper.mostLikes
 
-describe('total likes', () => {
+describe('most likes', () => {
     const listWithOneBlog = [
       {
         _id: '5a422aa71b54a676234d17f8',
@@ -72,7 +72,7 @@ describe('total likes', () => {
       assert.deepEqual(result, {'author': 'Edsger W. Dijkstra', 'likes': 5})
     }),
     
-    test('when list has multiple blogs, return the author with the most blogs', () => {
+    test('when list has multiple blogs, return the author with the most likes', () => {
       const result = mostLikes(blogs)
       assert.deepEqual(result, {'author': 'Edsger W. Dijkstra', 'likes': 17})
     }),

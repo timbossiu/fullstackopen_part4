@@ -4,7 +4,7 @@ const listHelper = require('../utils/list_helper')
 
 const mostBlogs = listHelper.mostBlogs
 
-describe('total likes', () => {
+describe('most blogs', () => {
     const listWithOneBlog = [
       {
         _id: '5a422aa71b54a676234d17f8',
