@@ -41,7 +41,7 @@ blogsRouter.delete('/:id', userExtractor, async (request, response) => {
     const currentUser = request.user
 
     if (currentUser.id != blogToBeDeleted.user.toString()) {
-      return response.status(400).json({ error: 'the current user does not have any authorities on this blog' })
+      return response.status(401)
     }
 
     deletedBlog = await Blog.deleteOne(blogToBeDeleted)
