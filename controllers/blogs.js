@@ -3,6 +3,15 @@ const Blog = require('../models/blog')
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
 
+const getUserByToken = async (token) => {
+  const decodedToken = jwt.verify(token, process.env.SECRET)
+    if (!decodedToken.id) {
+      return response.status(401).json({ error: 'token invalid' })
+    }
+    const user = await User.findById(decodedToken.id)
+    return user
+}
+
 
 blogsRouter.get('/', async (request, response) => {
     findedBlogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
@@ -14,13 +23,8 @@ blogsRouter.post('/', async (request, response) => {
 
     console.log(request.token)
 
-    const decodedToken = jwt.verify(request.token, process.env.SECRET)
-    if (!decodedToken.id) {
-      return response.status(401).json({ error: 'token invalid' })
-    }
-
-    const user = await User.findById(decodedToken.id)
-
+    const user = getUserByToken(request.token)
+    
     if (!user) {
       return response.status(400).json({ error: 'userId missing or not valid' })
     }
@@ -38,7 +42,15 @@ blogsRouter.post('/', async (request, response) => {
 
 
 blogsRouter.delete('/:id', async (request, response) => {
-    deletedBlog = await Blog.findByIdAndDelete(request.params.id)
+    blogToBeDeleted = await Blog.findById(request.params.id)
+
+    const currentUser = await getUserByToken(request.token)
+
+    if (currentUser.id != blogToBeDeleted.user.toString()) {
+      return response.status(400).json({ error: 'the current user does not have any authorities on this blog' })
+    }
+
+    deletedBlog = await Blog.deleteOne(blogToBeDeleted)
 
     if (deletedBlog) {
       response.status(204).json(deletedBlog)
