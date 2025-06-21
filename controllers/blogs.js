@@ -1,15 +1,9 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
-const User = require('../models/user')
-const jwt = require('jsonwebtoken')
+const { userExtractor } = require('../utils/middleware')
 
 const getUserByToken = async (token) => {
-  const decodedToken = jwt.verify(token, process.env.SECRET)
-    if (!decodedToken.id) {
-      return response.status(401).json({ error: 'token invalid' })
-    }
-    const user = await User.findById(decodedToken.id)
-    return user
+ 
 }
 
 
@@ -18,12 +12,12 @@ blogsRouter.get('/', async (request, response) => {
     response.json(findedBlogs)
 })
   
-blogsRouter.post('/', async (request, response) => {
+blogsRouter.post('/', userExtractor, async (request, response) => {
     const blog = new Blog(request.body)
 
     console.log(request.token)
 
-    const user = getUserByToken(request.token)
+    const user = request.user
     
     if (!user) {
       return response.status(400).json({ error: 'userId missing or not valid' })
@@ -41,10 +35,10 @@ blogsRouter.post('/', async (request, response) => {
 })
 
 
-blogsRouter.delete('/:id', async (request, response) => {
+blogsRouter.delete('/:id', userExtractor, async (request, response) => {
     blogToBeDeleted = await Blog.findById(request.params.id)
 
-    const currentUser = await getUserByToken(request.token)
+    const currentUser = request.user
 
     if (currentUser.id != blogToBeDeleted.user.toString()) {
       return response.status(400).json({ error: 'the current user does not have any authorities on this blog' })
