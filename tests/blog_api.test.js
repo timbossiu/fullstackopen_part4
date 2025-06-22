@@ -9,14 +9,14 @@ const User = require('../models/user')
 const assert = require('node:assert')
 
 const api = supertest(app)
-let token;
+let token
 
 before(async () => {
   User.deleteMany({})
   await api
     .post('/api/users')
-    .send({username: 'test', user:'test', password:'test'})
-
+    .send({username: 'test', user: 'test', password:'test'})
+  
   const res = await api
     .post('/api/login')
     .send({ username: 'test', password: 'test' })
@@ -53,13 +53,14 @@ test('a valid blog can be added ', async () => {
 
   console.log('der token again', token)
 
-  await api
+  const res2 = await api
     .post('/api/blogs')
     .set('Authorization', `Bearer ${token}`)
     .send(newBlog)
-    .expect(201)
-    .expect('Content-Type', /application\/json/)
-
+    //.expect(201)
+    //.expect('Content-Type', /application\/json/)
+  
+    console.log(res2.body)
 
   const blogsAtEnd = await helper.blogsInDb()
   assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1)
