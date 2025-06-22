@@ -1,14 +1,29 @@
-const { test, after, beforeEach } = require('node:test')
+const { test, after, beforeEach, before } = require('node:test')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
 const helper = require('./test_helper')
+const User = require('../models/user')
 
 const assert = require('node:assert')
 
 const api = supertest(app)
+let token;
 
+before(async () => {
+  User.deleteMany({})
+  await api
+    .post('/api/users')
+    .send({username: 'test', user:'test', password:'test'})
+
+  const res = await api
+    .post('/api/login')
+    .send({ username: 'test', password: 'test' })
+  
+  token = res.body.token
+  console.log('this is the token: ', token)
+})
 
 beforeEach(async () => {
   await Blog.deleteMany({})
@@ -35,12 +50,16 @@ test('a valid blog can be added ', async () => {
     likes: 2
   }
 
+
+  console.log('der token again', token)
+
   await api
     .post('/api/blogs')
-    .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRpbSIsImlkIjoiNjg1MTM3YWJhNDFlYTk3NmRiMWIwNjkyIiwiaWF0IjoxNzUwNTIxMTEzfQ._Fq6e8ZRp-_Cyv-aEt2q5LGA8DhLird8d7wERP5gAJA')
+    .set('Authorization', `Bearer ${token}`)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
+
 
   const blogsAtEnd = await helper.blogsInDb()
   assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1)

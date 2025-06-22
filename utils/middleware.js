@@ -7,12 +7,13 @@ const userExtractor = async (request, response, next) => {
   const authorization = request.get('authorization')
   if (authorization && authorization.startsWith('Bearer ')) {
     const extractedToken = authorization.replace('Bearer ', '')
-    
+    console.log('nochmal oida', extractedToken)
     const decodedToken = jwt.verify(extractedToken, process.env.SECRET)
     if (!decodedToken.id) {
       return response.status(401).json({ error: 'token invalid' })
     }
     const user = await User.findById(decodedToken.id)
+    console.log('user und so', decodedToken)
     request.user = user 
   }
   next()
