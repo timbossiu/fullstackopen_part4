@@ -89,6 +89,23 @@ test('delete succesfully the blog with the same user ', async () => {
   assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
 })
 
+test('delete the blog with the no user provided', async () => {
+  //initalBlogs has to be extended with User
+  
+  const blogsAtStart = await helper.blogsInDb()
+
+  console.log(blogsAtStart[0])
+  const firstId = blogsAtStart[0].id
+
+  await api
+    .delete(`/api/blogs/${firstId}`)
+    .expect(401)
+  
+  const blogsAtEnd = await helper.blogsInDb()
+
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+})
+
 test('blog is saved with renamed id not _id', async () => {
   blogsAtEnd = await helper.blogsInDb()
   assert.ok('id' in blogsAtEnd[0], '"id" field exists')
