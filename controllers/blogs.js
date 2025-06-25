@@ -10,7 +10,6 @@ blogsRouter.get('/', async (request, response) => {
 blogsRouter.post('/', userExtractor, async (request, response) => {
     const blog = new Blog(request.body)
 
-    console.log(request.token)
 
     const user = request.user
     
@@ -35,10 +34,9 @@ blogsRouter.delete('/:id', userExtractor, async (request, response) => {
 
     const currentUser = request.user
 
-    if (currentUser.id != blogToBeDeleted.user.toString()) {
-      return response.status(401)
+    if (!currentUser || currentUser.id != blogToBeDeleted.user.toString()) {
+      return response.status(401).end()
     }
-
     deletedBlog = await Blog.deleteOne(blogToBeDeleted)
 
     if (deletedBlog) {

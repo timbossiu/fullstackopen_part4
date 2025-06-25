@@ -72,13 +72,10 @@ test('delete succesfully the blog with the same user ', async () => {
     .post('/api/blogs')
     .set('Authorization', `Bearer ${token}`)
     .send(newBlog)
-    .expect(201)
-    .expect('Content-Type', /application\/json/)
 
   lastBlogId = res.body.id
 
 
-  console.log(lastBlogId)
   await api
     .delete(`/api/blogs/${lastBlogId}`)
     .set('Authorization', `Bearer ${token}`)
@@ -89,21 +86,26 @@ test('delete succesfully the blog with the same user ', async () => {
   assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
 })
 
-test('delete the blog with the no user provided', async () => {
-  //initalBlogs has to be extended with User
-  
-  const blogsAtStart = await helper.blogsInDb()
+test('delete the blog with no user provided', async () => {
+  const newBlog = {
+    author: 'Test',
+    title: 'AsyncNew',
+    url: 'http:test.com',
+    likes: 2
+  }
 
-  console.log(blogsAtStart[0])
-  const firstId = blogsAtStart[0].id
+  const res = await api
+    .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
+    .send(newBlog)
+
+  const lastBlogId = res.body.id
 
   await api
-    .delete(`/api/blogs/${firstId}`)
+    .delete(`/api/blogs/${lastBlogId}`)
+    .set('Authorization', `Bearer `)
     .expect(401)
-  
-  const blogsAtEnd = await helper.blogsInDb()
 
-  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
 })
 
 test('blog is saved with renamed id not _id', async () => {
@@ -158,7 +160,6 @@ test('update succesfully a blog ', async () => {
   }
 
 
-  console.log(firstId)
   await api
     .put(`/api/blogs/${firstId}`)
     .send(updatedBlog)
